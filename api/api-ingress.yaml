@@ -1,0 +1,46 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: api
+  namespace: production
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/subnets: subnet-06314423dc82f4f03,subnet-0ea0c7c903e285333,subnet-053ef1eed7345e9e3
+    alb.ingress.kubernetes.io/tags: Environment=production,Team=dev
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-1:339126146861:certificate/708f66bb-63b3-48c7-b82b-b53fd17dab4a
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
+    alb.ingress.kubernetes.io/healthcheck-port: traffic-port
+    alb.ingress.kubernetes.io/healthcheck-path: /health-check
+    alb.ingress.kubernetes.io/healthcheck-interval-seconds: "15"
+    alb.ingress.kubernetes.io/healthcheck-timeout-seconds: "5"
+    alb.ingress.kubernetes.io/success-codes: "200"
+    alb.ingress.kubernetes.io/healthy-threshold-count: "2"
+    alb.ingress.kubernetes.io/unhealthy-threshold-count: "2"
+spec:
+  rules:
+    - host: api.studihub.io
+      http:
+        paths:
+          - path: /graphql
+            backend:
+              serviceName: api
+              servicePort: 80
+          - path: /api/*
+            backend:
+              serviceName: api
+              servicePort: 80
+    - host: api-admin.studihub.io
+      http:
+        paths:
+          - path: /graphql
+            backend:
+              serviceName: admin-api
+              servicePort: 80
+          - path: /admin-api/*
+            backend:
+              serviceName: admin-api
+              servicePort: 80

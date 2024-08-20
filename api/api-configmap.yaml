@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-env-config-v1
+  namespace: production
+data:
+  VERSION: 1

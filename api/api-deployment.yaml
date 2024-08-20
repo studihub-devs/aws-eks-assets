@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: production
+spec:
+  selector:
+    matchLabels:
+      app: api
+  replicas: 5
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - image: image:version
+          imagePullPolicy: IfNotPresent
+          name: api
+          resources:
+            requests:
+              memory: "700Mi"
+              cpu: "700m"
+            limits:
+              memory: "1000Mi"
+              cpu: "1000m"
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: api-env-config-v1
+          livenessProbe:
+            httpGet:
+              path: /health-check
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /health-check
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1              
+          volumeMounts:
+            - mountPath: "/app/firebase-adminsdk"
+              name: firebase-adminsdk
+              readOnly: true
+      imagePullSecrets:
+        - name: ecr-registry-key
+      volumes:
+        - name: firebase-adminsdk
+          secret:
+            secretName: firebase-adminsdk
