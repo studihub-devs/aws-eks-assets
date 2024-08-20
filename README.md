@@ -1,6 +1,4 @@
-# k8s
-
-k8s
+# AWS EKS
 
 ## Tutorial
 
